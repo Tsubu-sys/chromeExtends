@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "TTS Player",
+  "version": "1.0",
+  "description": "Reads selected text or clipboard content directly via overlay UI, automatically determining EN/JP languages.",
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "tts",
+    "clipboardRead",
+    "scripting",
+    "offscreen"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Open TTS Player UI"
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  }
+}
