@@ -19,8 +19,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             });
 
             if (results && results[0] && results[0].result) {
-                const textWithNewlines = results[0].result;
-                injectAndPlay(tab.id, textWithNewlines);
+                injectAndPlay(tab.id, results[0].result);
             } else if (info.selectionText) {
                 injectAndPlay(tab.id, info.selectionText);
             }
@@ -78,14 +77,31 @@ async function ensureOffscreenDocument() {
 }
 
 // -------------------------
+// TTS State (一元管理)
+// -------------------------
+let ttsState = {
+    chunks: [],
+    chunkIndex: 0,
+    fullText: '',
+    isPlaying: false,
+    activeTabId: null,
+    rate: 1.0,
+};
+
+function resetTtsState() {
+    ttsState = {
+        chunks: [],
+        chunkIndex: 0,
+        fullText: '',
+        isPlaying: false,
+        activeTabId: null,
+        rate: 1.0,
+    };
+}
+
+// -------------------------
 // TTS Logic
 // -------------------------
-let currentChunks = [];
-let currentChunkIndex = 0;
-let currentFullText = '';
-let isPlaying = false;
-let activeTabId = null;
-
 function detectLanguage(text) {
     const jpRegex = /[\u3040-\u309F]|[\u30A0-\u30FF]|[\u4E00-\u9FAF]/;
     return jpRegex.test(text) ? "ja-JP" : "en-US";
@@ -102,36 +118,38 @@ function playText(text, tabId) {
     // Stop any current reading
     chrome.tts.stop();
 
-    currentFullText = text;
-    currentChunks = processText(text);
-    currentChunkIndex = 0;
-    activeTabId = tabId;
+    ttsState.fullText = text;
+    ttsState.chunks = processText(text);
+    ttsState.chunkIndex = 0;
+    ttsState.activeTabId = tabId;
     playNextChunk();
 }
 
 function playNextChunk() {
-    if (currentChunkIndex >= currentChunks.length) {
-        isPlaying = false;
+    if (ttsState.chunkIndex >= ttsState.chunks.length) {
+        ttsState.isPlaying = false;
         notifyUIState("STOPPED");
         return;
     }
 
-    isPlaying = true;
-    const chunk = currentChunks[currentChunkIndex];
-    const cleanText = chunk.replace(/[#`";:*_+~\(){}[\]]/g, " ");
+    ttsState.isPlaying = true;
+    const chunk = ttsState.chunks[ttsState.chunkIndex];
+    // Fix: 文字クラス内のエスケープを修正（() {} は不要、[] は \[ \] でエスケープ）
+    const cleanText = chunk.replace(/[#`";:*_+~(){}[\]]/g, " ");
     const lang = detectLanguage(cleanText);
 
     notifyUIState("PLAYING", chunk);
 
     chrome.tts.speak(cleanText, {
         lang: lang,
+        rate: ttsState.rate,
         enqueue: false,
         onEvent: function (event) {
             if (event.type === 'end') {
-                currentChunkIndex++;
+                ttsState.chunkIndex++;
                 playNextChunk();
             } else if (event.type === 'interrupted' || event.type === 'cancelled' || event.type === 'error') {
-                isPlaying = false;
+                ttsState.isPlaying = false;
                 notifyUIState("STOPPED");
             }
         }
@@ -139,12 +157,12 @@ function playNextChunk() {
 }
 
 function notifyUIState(state, chunk = "") {
-    if (!activeTabId) return;
-    chrome.tabs.sendMessage(activeTabId, {
+    if (!ttsState.activeTabId) return;
+    chrome.tabs.sendMessage(ttsState.activeTabId, {
         type: "STATE_UPDATE",
         state: state,
         text: chunk,
-        fullText: currentFullText
+        fullText: ttsState.fullText
     }).catch(e => console.error("Failed to notify UI:", e));
 }
 
@@ -159,52 +177,63 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.type === "COMMAND_PAUSE") {
         chrome.tts.pause();
-        isPlaying = false;
+        ttsState.isPlaying = false;
         notifyUIState("PAUSED");
-    } else if (request.type === "COMMAND_RESUME") {
-        if (currentChunks.length > 0 && currentChunkIndex < currentChunks.length) {
-            if (activeTabId !== sender.tab?.id) activeTabId = sender.tab?.id;
 
-            if (isPlaying === false && currentChunkIndex > 0) {
-                chrome.tts.isSpeaking((speaking) => {
-                    if (speaking) {
-                        chrome.tts.resume();
-                        isPlaying = true;
-                        notifyUIState("PLAYING", currentChunks[currentChunkIndex] || "");
-                    } else {
-                        playNextChunk();
-                    }
-                });
-            } else {
-                chrome.tts.resume();
-                isPlaying = true;
-                notifyUIState("PLAYING", currentChunks[currentChunkIndex] || "");
-            }
-        } else if (request.fallbackText) {
+    } else if (request.type === "COMMAND_RESUME") {
+        // fallback: チャンクがない場合はテキストから再生
+        if (ttsState.chunks.length === 0 && request.fallbackText) {
             playText(request.fallbackText, sender.tab?.id);
+            return;
         }
+        if (ttsState.chunks.length === 0 || ttsState.chunkIndex >= ttsState.chunks.length) return;
+
+        if (ttsState.activeTabId !== sender.tab?.id) ttsState.activeTabId = sender.tab?.id;
+
+        // isSpeaking を確認して resume か playNextChunk を選択
+        chrome.tts.isSpeaking((speaking) => {
+            if (speaking) {
+                chrome.tts.resume();
+            } else {
+                playNextChunk();
+            }
+            ttsState.isPlaying = true;
+            notifyUIState("PLAYING", ttsState.chunks[ttsState.chunkIndex] || "");
+        });
+
     } else if (request.type === "COMMAND_STOP") {
         chrome.tts.stop();
-        isPlaying = false;
+        ttsState.isPlaying = false;
         notifyUIState("STOPPED");
+
     } else if (request.type === "COMMAND_PLAY_DIRECT") {
         playText(request.text, sender.tab?.id);
+
     } else if (request.type === "COMMAND_PREV") {
-        if (currentChunks.length > 0) {
+        if (ttsState.chunks.length > 0) {
             chrome.tts.stop();
-            currentChunkIndex = Math.max(0, currentChunkIndex - 1);
+            ttsState.chunkIndex = Math.max(0, ttsState.chunkIndex - 1);
             playNextChunk();
         }
+
     } else if (request.type === "COMMAND_NEXT") {
-        if (currentChunks.length > 0 && currentChunkIndex < currentChunks.length - 1) {
+        if (ttsState.chunks.length > 0 && ttsState.chunkIndex < ttsState.chunks.length - 1) {
             chrome.tts.stop();
-            currentChunkIndex++;
+            ttsState.chunkIndex++;
             playNextChunk();
         } else {
             chrome.tts.stop();
-            currentChunkIndex = currentChunks.length;
-            isPlaying = false;
+            ttsState.chunkIndex = ttsState.chunks.length;
+            ttsState.isPlaying = false;
             notifyUIState("STOPPED");
+        }
+
+    } else if (request.type === "COMMAND_SET_RATE") {
+        ttsState.rate = Math.min(2.0, Math.max(0.5, parseFloat(request.rate) || 1.0));
+        // If currently playing, restart current chunk at new rate immediately
+        if (ttsState.isPlaying && ttsState.chunks.length > 0) {
+            chrome.tts.stop();
+            playNextChunk();
         }
     }
 });
