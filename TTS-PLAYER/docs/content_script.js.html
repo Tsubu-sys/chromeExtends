@@ -1,4 +1,32 @@
-// content_script.js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: content_script.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: content_script.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// content_script.js
 
 /**
  * @file content_script.js
@@ -263,7 +291,7 @@ class SmartTTSUI {
       document.body.appendChild(this.host);
     } else {
       window.addEventListener('DOMContentLoaded', () => {
-        if (document.body && !document.body.contains(this.host)) {
+        if (document.body &amp;&amp; !document.body.contains(this.host)) {
           document.body.appendChild(this.host);
         }
       });
@@ -314,36 +342,36 @@ class SmartTTSUI {
     const container = document.createElement('div');
     container.id = 'smart-tts-container';
     container.innerHTML = `
-      <!-- Clipboard expanded panel (shown only in clip mode) -->
-      <div id="clip-panel">
-        <div class="panel-title">📋 クリップボード</div>
-        <div class="text-display" id="text-display">クリップボードから読み上げ中...</div>
-      </div>
+      &lt;!-- Clipboard expanded panel (shown only in clip mode) -->
+      &lt;div id="clip-panel">
+        &lt;div class="panel-title">📋 クリップボード&lt;/div>
+        &lt;div class="text-display" id="text-display">クリップボードから読み上げ中...&lt;/div>
+      &lt;/div>
 
-      <!-- Speed panel -->
-      <div id="speed-panel">
-        <div class="speed-header">
-          <span class="speed-title">⚡ 読み上げ速度</span>
-          <span class="speed-label" id="speed-label">×1.0</span>
-        </div>
-        <input class="speed-slider" id="speed-slider" type="range" min="0.5" max="2.0" step="0.1" value="1.0">
-        <div class="speed-ticks">
-          <span>×0.5</span><span>×1.0</span><span>×1.5</span><span>×2.0</span>
-        </div>
-      </div>
+      &lt;!-- Speed panel -->
+      &lt;div id="speed-panel">
+        &lt;div class="speed-header">
+          &lt;span class="speed-title">⚡ 読み上げ速度&lt;/span>
+          &lt;span class="speed-label" id="speed-label">×1.0&lt;/span>
+        &lt;/div>
+        &lt;input class="speed-slider" id="speed-slider" type="range" min="0.5" max="2.0" step="0.1" value="1.0">
+        &lt;div class="speed-ticks">
+          &lt;span>×0.5&lt;/span>&lt;span>×1.0&lt;/span>&lt;span>×1.5&lt;/span>&lt;span>×2.0&lt;/span>
+        &lt;/div>
+      &lt;/div>
 
-      <!-- Drag handle -->
-      <div class="drag-handle" id="drag-handle" title="ドラッグで移動">⠿</div>
-      <!-- Vertical bar buttons -->
-      <button class="bar-btn" id="click-to-read-btn" title="画面内選択モード">👆</button>
-      <button class="bar-btn" id="clip-btn" title="クリップボードから読み上げ">📋</button>
-      <button class="bar-btn" id="speed-btn" title="読み上げ速度">⚡</button>
-      <div class="speed-bar-label" id="speed-bar-label">×1.0</div>
-      <div class="divider"></div>
-      <button class="bar-btn" id="prev-btn" title="前へ">⏮</button>
-      <button class="bar-btn primary" id="play-pause-btn" title="再生/一時停止">▶</button>
-      <button class="bar-btn" id="next-btn" title="次へ">⏭</button>
-      <button class="bar-btn danger" id="stop-btn" title="停止">⏹</button>
+      &lt;!-- Drag handle -->
+      &lt;div class="drag-handle" id="drag-handle" title="ドラッグで移動">⠿&lt;/div>
+      &lt;!-- Vertical bar buttons -->
+      &lt;button class="bar-btn" id="click-to-read-btn" title="画面内選択モード">👆&lt;/button>
+      &lt;button class="bar-btn" id="clip-btn" title="クリップボードから読み上げ">📋&lt;/button>
+      &lt;button class="bar-btn" id="speed-btn" title="読み上げ速度">⚡&lt;/button>
+      &lt;div class="speed-bar-label" id="speed-bar-label">×1.0&lt;/div>
+      &lt;div class="divider">&lt;/div>
+      &lt;button class="bar-btn" id="prev-btn" title="前へ">⏮&lt;/button>
+      &lt;button class="bar-btn primary" id="play-pause-btn" title="再生/一時停止">▶&lt;/button>
+      &lt;button class="bar-btn" id="next-btn" title="次へ">⏭&lt;/button>
+      &lt;button class="bar-btn danger" id="stop-btn" title="停止">⏹&lt;/button>
     `;
     this.shadow.appendChild(container);
 
@@ -566,11 +594,11 @@ class SmartTTSUI {
 
     let target = e.target;
     // Walk up if empty element clicked
-    while (target && target !== document.body && !target.innerText?.trim()) {
+    while (target &amp;&amp; target !== document.body &amp;&amp; !target.innerText?.trim()) {
       target = target.parentElement;
     }
 
-    if (target && target.innerText) {
+    if (target &amp;&amp; target.innerText) {
       let collectedText = target.innerText.trim();
 
       // Use a TreeWalker to gather subsequent sibling/block text elements
@@ -582,7 +610,7 @@ class SmartTTSUI {
             const style = window.getComputedStyle(node);
             if (style.display === 'none' || style.visibility === 'hidden') return NodeFilter.FILTER_REJECT;
             if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'SVG', 'IMG'].includes(node.tagName)) return NodeFilter.FILTER_REJECT;
-            if (node.innerText && node.innerText.trim().length > 0) return NodeFilter.FILTER_ACCEPT;
+            if (node.innerText &amp;&amp; node.innerText.trim().length > 0) return NodeFilter.FILTER_ACCEPT;
             return NodeFilter.FILTER_SKIP;
           }
         }
@@ -591,11 +619,11 @@ class SmartTTSUI {
       walker.currentNode = target;
       let blocksCollected = 0;
       let nextNode;
-      while ((nextNode = walker.nextNode()) && blocksCollected < 15) {
+      while ((nextNode = walker.nextNode()) &amp;&amp; blocksCollected &lt; 15) {
         if (target.contains(nextNode)) continue;
         const text = nextNode.innerText.trim();
         // Basic heuristics to avoid adding same text blocks multiple times from nested wrappers
-        if (text && !collectedText.includes(text) && !text.includes(collectedText)) {
+        if (text &amp;&amp; !collectedText.includes(text) &amp;&amp; !text.includes(collectedText)) {
           collectedText += "\n\n" + text;
           blocksCollected++;
         }
@@ -626,7 +654,7 @@ class SmartTTSUI {
     // Collect all valid text nodes
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (node) => {
-        if (node.parentElement && ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) {
+        if (node.parentElement &amp;&amp; ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) {
           return NodeFilter.FILTER_REJECT;
         }
         return NodeFilter.FILTER_ACCEPT;
@@ -643,7 +671,7 @@ class SmartTTSUI {
     const charMap = [];
     for (const node of nodes) {
       const text = node.nodeValue.toLowerCase();
-      for (let i = 0; i < text.length; i++) {
+      for (let i = 0; i &lt; text.length; i++) {
         if (!/\s/.test(text[i])) {
           charMap.push({ node, offset: i, char: text[i] });
         }
@@ -656,9 +684,9 @@ class SmartTTSUI {
     const targetLen = searchTarget.length;
     let matchStartIndex = -1;
 
-    for (let i = 0; i <= charMap.length - targetLen; i++) {
+    for (let i = 0; i &lt;= charMap.length - targetLen; i++) {
       let isMatch = true;
-      for (let j = 0; j < targetLen; j++) {
+      for (let j = 0; j &lt; targetLen; j++) {
         if (charMap[i + j].char !== searchTarget[j]) {
           isMatch = false;
           break;
@@ -677,7 +705,7 @@ class SmartTTSUI {
       let currentStartOffset = -1;
       let lastOffset = -1;
 
-      for (let k = 0; k < targetLen; k++) {
+      for (let k = 0; k &lt; targetLen; k++) {
         const point = charMap[matchStartIndex + k];
 
         if (point.node !== currentNode) {
@@ -721,18 +749,18 @@ class SmartTTSUI {
    */
   updatePopupTextWithHighlight(fullContent, playingChunk) {
     if (!fullContent || !playingChunk) return;
-    const safeChunk = playingChunk.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const safeContent = fullContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeChunk = playingChunk.replace(/&amp;/g, '&amp;amp;').replace(/&lt;/g, '&amp;lt;').replace(/>/g, '&amp;gt;');
+    const safeContent = fullContent.replace(/&amp;/g, '&amp;amp;').replace(/&lt;/g, '&amp;lt;').replace(/>/g, '&amp;gt;');
 
     const parts = safeContent.split(safeChunk);
     if (parts.length > 1) {
       this.elems.textDisplay.innerHTML =
-        `${parts[0]}<span class="highlight-chunk">${safeChunk}</span>${parts.slice(1).join(safeChunk)}`
-          .replace(/\n/g, '<br>');
+        `${parts[0]}&lt;span class="highlight-chunk">${safeChunk}&lt;/span>${parts.slice(1).join(safeChunk)}`
+          .replace(/\n/g, '&lt;br>');
       const el = this.elems.textDisplay.querySelector('.highlight-chunk');
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
-      this.elems.textDisplay.innerHTML = safeContent.replace(/\n/g, '<br>');
+      this.elems.textDisplay.innerHTML = safeContent.replace(/\n/g, '&lt;br>');
     }
   }
 
@@ -754,7 +782,7 @@ class SmartTTSUI {
    * ページ遷移などで body が再生成された際の保険として各表示操作の前に呼ぶ。
    */
   ensureAppended() {
-    if (document.body && !document.body.contains(this.host)) {
+    if (document.body &amp;&amp; !document.body.contains(this.host)) {
       document.body.appendChild(this.host);
     }
   }
@@ -801,12 +829,12 @@ if (!window._smartTtsUI) {
    * - `STATE_UPDATE` : 再生状態を更新し、必要に応じてハイライトを更新する
    *
    * @param {Object} request - 受信メッセージオブジェクト
-   * @param {string} request.type - メッセージタイプ
-   * @param {string} [request.state] - 再生状態（STATE_UPDATE 時）
-   * @param {string} [request.text] - 現在再生中のチャンクテキスト（STATE_UPDATE 時）
-   * @param {string} [request.fullText] - 読み上げ対象テキスト全文（STATE_UPDATE 時）
-   * @param {chrome.runtime.MessageSender} sender - メッセージ送信元の情報
-   * @param {function} sendResponse - 応答関数
+ * @param {string} request.type - メッセージタイプ
+ * @param {string} [request.state] - 再生状態（STATE_UPDATE 時）
+ * @param {string} [request.text] - 現在再生中のチャンクテキスト（STATE_UPDATE 時）
+ * @param {string} [request.fullText] - 読み上げ対象テキスト全文（STATE_UPDATE 時）
+ * @param {chrome.runtime.MessageSender} sender - メッセージ送信元の情報
+ * @param {function} sendResponse - 応答関数
    */
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'PING') {
@@ -825,7 +853,7 @@ if (!window._smartTtsUI) {
       window._smartTtsUI.updateState(request.state);
 
       // 読み上げの状態に応じてハイライト、ハイライトの解除をする
-      if (request.state === 'PLAYING' && request.text) {
+      if (request.state === 'PLAYING' &amp;&amp; request.text) {
         window._smartTtsUI.highlightTextOnPage(request.text);
 
         // Only update text-display if clipboard panel is visible
@@ -841,3 +869,26 @@ if (!window._smartTtsUI) {
     }
   });
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SmartTTSUI.html">SmartTTSUI</a></li></ul><h3>Global</h3><ul><li><a href="global.html#cssStyles">cssStyles</a></li><li><a href="global.html#detectLanguage">detectLanguage</a></li><li><a href="global.html#ensureOffscreenDocument">ensureOffscreenDocument</a></li><li><a href="global.html#injectAndPlay">injectAndPlay</a></li><li><a href="global.html#injectUI">injectUI</a></li><li><a href="global.html#notifyUIState">notifyUIState</a></li><li><a href="global.html#playNextChunk">playNextChunk</a></li><li><a href="global.html#playText">playText</a></li><li><a href="global.html#processText">processText</a></li><li><a href="global.html#resetTtsState">resetTtsState</a></li><li><a href="global.html#sendHeartbeat">sendHeartbeat</a></li><li><a href="global.html#ttsState">ttsState</a></li><li><a href="global.html#%25E3%2583%258F%25E3%2583%25BC%25E3%2583%2588%25E3%2583%2593%25E3%2583%25BC%25E3%2583%2588%25E3%2581%25AE%25E9%2580%2581%25E4%25BF%25A1%25E9%2596%2593%25E9%259A%2594%25EF%25BC%2588%25E3%2583%259F%25E3%2583%25AA%25E7%25A7%2592%25EF%25BC%2589">ハートビートの送信間隔（ミリ秒）</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Mon Mar 02 2026 12:49:07 GMT+0900 (Japan Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

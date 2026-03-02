@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "jsdoc": "^4.0.5"
+  },
+  "scripts": {
+    "gen-docs": "jsdoc -d docs src/"
+  }
+}
